@@ -1,0 +1,118 @@
+﻿'''TODO
+'---------
+''Bank Setup
+'Add in export of bank settings / import of bank settings
+'Set up dialog picker for folder to save file into
+'Add in default name of file
+'Add in custom mark to track the settings sheet for import
+'---------
+''Categorize
+'Split transactions into two + rows so that way you can clarify different categories (i.e. groceries and alcohol)
+'Auto-fill based on past - is this possible?
+'---------
+''Misc
+'Working sheet picks up Jan 1900 (0) as date
+'Working sheet picks up "Total Budget" from bottom of categories
+
+
+Public Sub CategorizeTrans()
+    frmCat.Show
+End Sub
+
+Public Sub ExportSettings()
+    Dim wbkExport As Workbook
+    Dim shtToExport As Worksheet
+    
+    
+    
+    Set shtToExport = expListSheet     'Sheet to export as CSV
+    Set wbkExport = Application.Workbooks.Add
+    shtToExport.Copy Before:=wbkExport.Worksheets(wbkExport.Worksheets.Count)
+    Application.DisplayAlerts = False                       'Possibly overwrite without asking
+    wbkExport.SaveAs Filename:="C:\tmp\test.csv", FileFormat:=xlCSV
+    Application.DisplayAlerts = True
+    wbkExport.Close SaveChanges:=False
+End Sub
+
+Public Sub GetTransactions()
+    
+    Application.StatusBar = "Loading data and transactions to table..."
+    
+    If InStr(ActiveSheet.Cells(2, 2).Value, "Annual") <> 0 Then
+        strYear = ActiveSheet.Cells(3, 3).Value
+        strMonth = ""
+        strCat = ""
+    ElseIf InStr(ActiveSheet.Cells(2, 2).Value, "Monthly") <> 0 Then
+        strYear = ActiveSheet.Cells(3, 3).Value
+        strMonth = ActiveSheet.Cells(4, 3).Value
+        strCat = ""
+    ElseIf InStr(ActiveSheet.Cells(2, 2).Value, "Category") <> 0 Then
+        strYear = ActiveSheet.Cells(3, 3).Value
+        strMonth = ""
+        strCat = ActiveSheet.Cells(4, 3).Value
+    Else
+        MsgBox "Error creating list of transactions. Make sure this macro is being run from a Dashboard page."
+        Exit Sub
+    End If
+    
+    Application.ScreenUpdating = False
+    
+    ActiveSheet.Range("H9:M9", ActiveSheet.Range("H" & ActiveSheet.Rows.Count).End(xlUp)).Select
+    While Selection.ListObject.ListRows.Count > 0
+        Selection.ListObject.ListRows(1).Delete
+    Wend
+    
+    Application.ScreenUpdating = True
+    
+    Call UpdateTempExpenses(strYear, strMonth, strCat, ActiveSheet, 9)
+    
+    Application.StatusBar = False
+    
+End Sub
+
+Private Sub UpdateTempExpenses(vYear, vMonth, vCat, ws As Worksheet, startRowNum As Integer)
+
+    Application.ScreenUpdating = False
+    
+    Set expListBook = ActiveWorkbook
+    Set expListSheet = expListBook.Sheets("Expense List")
+    
+    lastExpenseRow = GetEmptyRow(expListSheet, 11, 3) - 1
+    c = startRowNum
+
+    For j = 3 To lastExpenseRow
+        matchesYear = False
+        matchesMonth = False
+        matchesCat = False
+        
+        Set Rng = Sheets("Expense List").Range("A" & j & ":N" & j)
+        arrValues = Rng.Value
+        
+        If vYear = "" Or vYear = "All" Or arrValues(1, 14) = vYear Then
+            matchesYear = True
+        End If
+        
+        If vMonth = "" Or vMonth = "All" Or arrValues(1, 13) = vMonth Then
+            matchesMonth = True
+        End If
+        
+        If vCat = "" Or arrValues(1, 6) = vCat Then
+            matchesCat = True
+        End If
+        
+        If matchesYear = True And matchesMonth = True And matchesCat = True Then
+            With ws
+                .Cells(c, 8) = Format(Rng.Cells(1, 2).Value, "dd-mmm-yyyy")
+                .Cells(c, 9) = Rng.Cells(1, 3).Value
+                .Cells(c, 10) = Rng.Cells(1, 4).Value
+                .Cells(c, 11) = Rng.Cells(1, 6).Value
+                .Cells(c, 12) = Rng.Cells(1, 9).Value
+                .Cells(c, 13) = Rng.Cells(1, 10).Value
+                c = c + 1
+            End With
+        End If
+        
+    Next j
+
+    Application.ScreenUpdating = True
+End Sub

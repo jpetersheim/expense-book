@@ -1,0 +1,21 @@
+﻿Private Sub Worksheet_Change(ByVal Target As Range)
+
+    Dim KeyCells As Range
+    Set KeyCells = Range("C3:C4")
+
+    currSel = ActiveCell.Address
+
+    If Not Application.Intersect(KeyCells, Range(Target.Address)) _
+           Is Nothing Then
+
+        Call ThisWorkbook.GetTransactions
+        
+        lastBudgetItem = GetEmptyRow(ActiveSheet, 2, 9) - 1
+        ActiveSheet.ChartObjects("Category_Spending").Activate
+        ActiveChart.SetSourceData Source:=ActiveSheet.Range(Cells(9, 2), Cells(lastBudgetItem, 3))
+        
+        Range(currSel).Select
+        
+    End If
+
+End Sub
