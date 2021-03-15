@@ -1,37 +1,14 @@
 ﻿'''TODO
 '---------
-''Bank Setup
-'Add in export of bank settings / import of bank settings
-'Set up dialog picker for folder to save file into
-'Add in default name of file
-'Add in custom mark to track the settings sheet for import
-'---------
 ''Categorize
-'Split transactions into two + rows so that way you can clarify different categories (i.e. groceries and alcohol)
 'Auto-fill based on past - is this possible?
 '---------
 ''Misc
 'Working sheet picks up Jan 1900 (0) as date
 'Working sheet picks up "Total Budget" from bottom of categories
 
-
 Public Sub CategorizeTrans()
     frmCat.Show
-End Sub
-
-Public Sub ExportSettings()
-    Dim wbkExport As Workbook
-    Dim shtToExport As Worksheet
-    
-    
-    
-    Set shtToExport = expListSheet     'Sheet to export as CSV
-    Set wbkExport = Application.Workbooks.Add
-    shtToExport.Copy Before:=wbkExport.Worksheets(wbkExport.Worksheets.Count)
-    Application.DisplayAlerts = False                       'Possibly overwrite without asking
-    wbkExport.SaveAs Filename:="C:\tmp\test.csv", FileFormat:=xlCSV
-    Application.DisplayAlerts = True
-    wbkExport.Close SaveChanges:=False
 End Sub
 
 Public Sub GetTransactions()

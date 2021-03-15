@@ -12,6 +12,10 @@
         Call ThisWorkbook.GetTransactions
         
         lastBudgetItem = GetEmptyRow(ActiveSheet, 2, 9) - 1
+        If lastBudgetItem = 21 Then
+            lastBudgetItem = 20
+        End If
+        
         ActiveSheet.ChartObjects("Category_Spending").Activate
         ActiveChart.SetSourceData Source:=ActiveSheet.Range(Cells(9, 2), Cells(lastBudgetItem, 3))
         

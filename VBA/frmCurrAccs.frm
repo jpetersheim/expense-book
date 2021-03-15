@@ -69,7 +69,7 @@ Private Sub UserForm_Initialize()
     Call PopAccLsb
 End Sub
 
-Private Sub PopAccLsb()
+Public Sub PopAccLsb()
     lsbCurrAccs.Clear
     lastAccRow = GetEmptyRow(accVarWs, 1, 2) - 1
     c = 0

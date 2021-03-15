@@ -19,6 +19,7 @@ Public expListBook As Workbook
 Public expListSheet As Worksheet
 Public columnEmpty As Integer
 Public acctCheck As String
+Public totalAmt As Double
 
 Private Sub cmbChsAcc_Change()
 
@@ -65,6 +66,8 @@ Private Sub cmdCat_Click()
             End If
         Next j
     End With
+    
+    Call UpdateArrays
 End Sub
 
 Private Sub cmdCatList_Click()
@@ -78,6 +81,8 @@ Private Sub cmdCatList_Click()
             Rng.Cells(1, 9).Value = Me.txtDescription
         Next j
     End With
+    
+    Call UpdateArrays
 End Sub
 
 Private Sub cmdDelTrans_Click()
@@ -96,7 +101,8 @@ Private Sub cmdDelTrans_Click()
     End If
     
     Call SetTransIDs
-    
+    Call UpdateArrays
+    Call ListTransactions
 End Sub
 
 Private Sub cmdDeselAll_Click()
@@ -124,6 +130,9 @@ Private Sub cmdRevert_Click()
     Application.DisplayAlerts = True
     Application.ScreenUpdating = True
     
+    Call SetTransIDs
+    Call GetCategs
+    
     Unload Me
     
 End Sub
@@ -131,11 +140,13 @@ End Sub
 Private Sub cmdSave_Click()
     Call SetTransIDs
     Call BackupExpenses
+    Call GetCategs
 End Sub
 
 Private Sub cmdSaveClose_Click()
     Call SetTransIDs
     Call BackupExpenses
+    Call GetCategs
     
     Unload Me
 End Sub
@@ -145,7 +156,51 @@ Private Sub cmdSelAll_Click()
 End Sub
 
 Private Sub cmdSplitTrans_Click()
-
+    tcount = 0
+    With lsbTransactions
+        For j = 0 To .ListCount - 1
+            If .Selected(j) = True Then
+                tcount = tcount + 1
+            End If
+        Next j
+    End With
+    
+    If tcount > 1 Then
+        MsgBox "Can't split more than 1 transaction at a time."
+    ElseIf tcount = 0 Then
+        MsgBox "You must select a transaction to split."
+    End If
+    
+    transID = lsbTransactions.List(lsbTransactions.ListIndex, 6)
+    totalAmt = lsbTransactions.List(lsbTransactions.ListIndex, 1)
+    
+    frmSplitTrans.lblTotalAmt = "$" & totalAmt
+    frmSplitTrans.lblTrans2Amt = "$0.00"
+    frmSplitTrans.txtTrans1Amt.Value = 0
+    frmSplitTrans.Show
+    
+    If frmSplitTrans.cancelVar = True Then
+        Exit Sub
+    End If
+    
+    oneAmt = frmSplitTrans.txtTrans1Amt.Value
+    twoAmtStr = frmSplitTrans.lblTrans2Amt
+    twoAmt = Right(twoAmtStr, Len(twoAmtStr) - 1)
+    
+    expListSheet.Rows(transID + 2).Insert
+    For colNum = 2 To 15
+        expListSheet.Cells(transID + 2, colNum) = expListSheet.Cells(transID + 3, colNum)
+        If colNum = 3 Then
+            expListSheet.Cells(transID + 2, colNum) = oneAmt
+            expListSheet.Cells(transID + 3, colNum) = twoAmt
+        End If
+            
+        If colNum = 5 Then colNum = colNum + 1
+    Next colNum
+    
+    Call SetTransIDs
+    Call ListTransactions(Me.txtSearch.Value, columnEmpty, Me.cmbChsAcc.Value, Me.cmbChsDate.Value)
+    
 End Sub
 
 Private Sub cmdUpdate_Click()
@@ -207,33 +262,7 @@ Private Sub UserForm_Initialize()
     
     expListSheet.Activate
     
-    accArray = GetUnique(expListSheet.Range(Cells(3, 10), Cells(lastExpenseRow, 10)))
-    Me.cmbChsAcc.List = accArray
-    
-    If accArray(0) = "Account" Then
-        MsgBox "It doesn't appear any data has been imported yet."
-        expListBook.Sheets("Main Tab").Activate
-        End
-    End If
-    
-    Me.cmbChsAcc.AddItem ""
-    
-    dateArray = GetUnique(expListSheet.Range(Cells(3, 11), Cells(lastExpenseRow, 11)))
-    For j = LBound(dateArray) To UBound(dateArray)
-        dateArray(j) = CDate(dateArray(j))
-    Next j
-    Me.cmbChsDate.List = dateArray
-    Me.cmbChsDate.AddItem ""
-    
-    catArray = GetUnique(expListSheet.Range(Cells(3, 6), Cells(lastExpenseRow, 6)))
-    Me.cmbCategory.List = catArray
-    
-    compArray = GetUnique(expListSheet.Range(Cells(3, 7), Cells(lastExpenseRow, 7)))
-    Me.cmbCompany.List = compArray
-    
-    locArray = GetUnique(expListSheet.Range(Cells(3, 8), Cells(lastExpenseRow, 8)))
-    Me.cmbLocation.List = locArray
-    
+    Call UpdateArrays
     Call BackupExpenses
     Call ListTransactions
     
@@ -335,6 +364,7 @@ Private Sub ListTransactions(Optional filter As String, Optional colEmpty As Int
     
     Me.lblListNum = CStr(Me.lsbTransactions.ListCount)
     Me.lblSelNum = "0"
+    lsbTransactions.ListIndex = 1
 End Sub
 
 Private Sub ListSelect(lsb, all As Boolean)
@@ -373,4 +403,39 @@ End Sub
 
 Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
     Call cmdRevert_Click
+End Sub
+
+Private Sub UpdateArrays()
+    Application.ScreenUpdating = False
+    expListSheet.Activate
+
+    accArray = GetUnique(expListSheet.Range(Cells(3, 10), Cells(lastExpenseRow, 10)))
+    Me.cmbChsAcc.List = accArray
+    
+    If accArray(0) = "Account" Then
+        MsgBox "It doesn't appear any data has been imported yet."
+        expListBook.Sheets("Main Tab").Activate
+        End
+    End If
+    
+    Me.cmbChsAcc.AddItem ""
+    
+    dateArray = GetUnique(expListSheet.Range(Cells(3, 11), Cells(lastExpenseRow, 11)))
+    For j = LBound(dateArray) To UBound(dateArray)
+        dateArray(j) = CDate(dateArray(j))
+    Next j
+    Me.cmbChsDate.List = dateArray
+    Me.cmbChsDate.AddItem ""
+    
+    catArray = GetUnique(expListSheet.Range(Cells(3, 6), Cells(lastExpenseRow, 6)))
+    Me.cmbCategory.List = catArray
+    
+    compArray = GetUnique(expListSheet.Range(Cells(3, 7), Cells(lastExpenseRow, 7)))
+    Me.cmbCompany.List = compArray
+    
+    locArray = GetUnique(expListSheet.Range(Cells(3, 8), Cells(lastExpenseRow, 8)))
+    Me.cmbLocation.List = locArray
+    
+    expListBook.Sheets("Main Tab").Activate
+    Application.ScreenUpdating = True
 End Sub

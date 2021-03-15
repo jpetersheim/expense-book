@@ -26,9 +26,14 @@ Public Sub ImportData()
     varSheet.Visible = True
     varSheet.Activate
     lastVarSheetRow = GetEmptyRow(varSheet, 1, 2) - 1
-    compArr = GetUnique(varSheet.Range(Cells(2, 1), Cells(lastVarSheetRow, 1)))
-    accArr = GetUniqueIf(varSheet.Range(Cells(2, 2), Cells(lastVarSheetRow, 2)), _
-        varSheet.Range(Cells(2, 1), Cells(lastVarSheetRow, 1)), compName)
+    If lastVarSheetRow = 2 Then
+        compArr = Array(varSheet.Cells(2, 1).Value)
+        accArr = Array(varSheet.Cells(2, 2).Value)
+    Else
+        compArr = GetUnique(varSheet.Range(Cells(2, 1), Cells(lastVarSheetRow, 1)))
+        accArr = GetUniqueIf(varSheet.Range(Cells(2, 2), Cells(lastVarSheetRow, 2)), _
+            varSheet.Range(Cells(2, 1), Cells(lastVarSheetRow, 1)), compName)
+    End If
 
     'Show the form for information input
     frmSelectImport.Show

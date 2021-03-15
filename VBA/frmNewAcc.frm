@@ -48,9 +48,6 @@ Private Sub cmdAdd_Click()
         MsgBox "Row number can not be blank."
         Exit Sub
     End If
-
-    'TODO CHECK IF ACCOUNT EXISTS AND ASK ABOUT OVERWRITING IF NEW
-    'SAME FOR MODIFYING
     
     ActiveWorkbook.Sheets("Account Variables").Visible = xlSheetVisible
 
@@ -112,6 +109,8 @@ Private Sub cmdAdd_Click()
     End If
     
     accVarWs.Visible = xlSheetHidden
+    
+    Call frmCurrAccs.PopAccLsb
     
     Unload Me
     

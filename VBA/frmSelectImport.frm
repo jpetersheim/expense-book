@@ -54,8 +54,13 @@ Private Sub cmbCompany_Change()
     txbNick.Value = cmbCompany.Value & " " & cmbAccType.Value
     
     lastVarSheetRow = GetEmptyRow(varSheet, 1, 2) - 1
-    accArr = GetUniqueIf(varSheet.Range(Cells(2, 2), Cells(lastVarSheetRow, 2)), _
-        varSheet.Range(Cells(2, 1), Cells(lastVarSheetRow, 1)), cmbCompany.Value)
+    If lastVarSheetRow = 2 Then
+        accArr = Array(varSheet.Cells(2, 2).Value)
+    Else
+        accArr = GetUniqueIf(varSheet.Range(Cells(2, 2), Cells(lastVarSheetRow, 2)), _
+            varSheet.Range(Cells(2, 1), Cells(lastVarSheetRow, 1)), cmbCompany.Value)
+    End If
+    
     cmbAccType.List = accArr
 End Sub
 
