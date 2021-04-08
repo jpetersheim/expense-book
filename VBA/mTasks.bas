@@ -4,6 +4,9 @@ Public Sub GetCategs()
     Dim currCategArr As Variant
     Dim addCateg As Boolean
     
+    maxCateg = 20
+    finalCategRow = 10 + maxCateg
+    
     Application.ScreenUpdating = False
 
     Set expListBook = ActiveWorkbook
@@ -11,38 +14,44 @@ Public Sub GetCategs()
     
     expListSheet.Activate
     
-    LastRow = expListSheet.Range("A65536").End(xlUp).Row
-    categArr = GetUnique(expListSheet.Range(Cells(3, 6), Cells(LastRow, 6)))
+    lastRow = expListSheet.Range("A65536").End(xlUp).Row
+    categArr = GetUnique(expListSheet.Range(Cells(3, 6), Cells(lastRow, 6)))
     
     expListBook.Sheets("Main Tab").Activate
+    expListBook.Sheets("Main Tab").Range(Cells(11, 6), Cells(finalCategRow, 6)).ClearContents
     
-    For j = LBound(categArr) To UBound(categArr)
-        
-        emptyCategRow = GetEmptyRow(expListBook.Sheets("Main Tab"), 6, 11)
-        currCategArr = GetUnique(expListBook.Sheets("Main Tab").Range(Cells(11, 6), Cells(emptyCategRow - 1, 6)))
-        addCateg = True
-    
-        For k = LBound(currCategArr) To UBound(currCategArr)
-            If categArr(j) = currCategArr(k) Then
-                addCateg = False
+    If UBound(categArr) >= 20 Then
+        overCategs = UBound(categArr) - 20
+        For j = 20 To UBound(categArr)
+            If j = UBound(categArr) Then
+                msgCategs = msgCategs & categArr(j)
+            Else
+                msgCategs = msgCategs & categArr(j) & ", "
             End If
-        Next k
-        
-        If addCateg = True Then
-            expListBook.Sheets("Main Tab").Cells(emptyCategRow, 6) = categArr(j)
-        End If
-        
-    Next j
+        Next j
     
-    arrCats = GetUnique(Sheets("Main Tab").Range("F11", Range("F11").End(xlDown)))
+    MsgBox "You have " & UBound(categArr) + 1 & " categories. This workbook is currently limited to 20 categories." & vbCrLf & "Categories " & msgCategs & " are not listed to use."
+    End If
+    
+    expListBook.Sheets("Main Tab").Cells(11, 6).Resize(Min(UBound(categArr) + 1, maxCateg)) = WorksheetFunction.Transpose(categArr)
+    
+'    emptyCategRow = GetEmptyRow(expListBook.Sheets("Main Tab"), 6, 11)
+'
+'    If emptyCategRow >= (finalCategRow + 2) Then
+'        arrCats = GetUnique(Sheets("Main Tab").Range("F11:F" & finalCategRow))
+'    ElseIf emptyCategRow = 11 Then
+'        arrCats = GetUnique(Sheets("Main Tab").Range("F11:F12"))
+'    Else
+'        arrCats = GetUnique(Sheets("Main Tab").Range("F11", Range("F11").End(xlDown)))
+'    End If
     
     Sheets("Working Sheet").Visible = True
     Sheets("Working Sheet").Activate
     Sheets("Working Sheet").Range("D5", Range("D5").End(xlDown)).Clear
-    Sheets("Working Sheet").Cells(5, 4).Resize(UBound(arrCats) + 1) = WorksheetFunction.Transpose(arrCats)
+    Sheets("Working Sheet").Cells(5, 4).Resize(Min(UBound(categArr) + 1, maxCateg)) = WorksheetFunction.Transpose(categArr)
     
-    LastRow = GetEmptyRow(Sheets("Working Sheet"), 4, 3) - 1
-    ActiveWorkbook.Names("Cat_List").RefersTo = Sheets("Working Sheet").Range(Cells(3, 4), Cells(LastRow, 4))
+    lastRow = GetEmptyRow(Sheets("Working Sheet"), 4, 3) - 1
+    ActiveWorkbook.Names("Cat_List").RefersTo = Sheets("Working Sheet").Range(Cells(3, 4), Cells(lastRow, 4))
     Sheets("Working Sheet").Visible = False
     
     Sheets("Main Tab").Activate
@@ -103,6 +112,11 @@ Public Sub ImportSettings()
             sFile = .SelectedItems(1)
         End If
     End With
+    
+    If sFile = "" Then
+        MsgBox "No file selected."
+        Exit Sub
+    End If
     
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False

@@ -1,5 +1,5 @@
 Attribute VB_Name = "mUniversals"
-Public Sub progressbar(current, max)
+Public Sub progressbar(current, Max)
     'Call this at the end of your loop to track progress in it
     'Current = current position in loop (x in "x out of y")
     'Max = max number that the loop will go to (y in "x out of y")
@@ -10,7 +10,7 @@ Public Sub progressbar(current, max)
     End If
     
     'Math from variables
-    pctCompl = current / max * 100
+    pctCompl = current / Max * 100
     pctCompl = Round(pctCompl)
 
     'Update user form
@@ -55,8 +55,8 @@ dlgCheck = True
 
 'Repeats # of selected items and confirms
     If selectedCount >= minItems And selectedCount <= maxItems Then
-        Y = MsgBox("You have selected " & selectedCount & " files.  Is this correct?.", 4132, "Confirm Selections")
-        If Y = vbNo Then
+        y = MsgBox("You have selected " & selectedCount & " files.  Is this correct?.", 4132, "Confirm Selections")
+        If y = vbNo Then
             dlgCheck = False
         End If
     End If
@@ -69,20 +69,20 @@ dlgCheck = True
 End Function
 
 Public Function GetUnique(uniqueRange As Range)
-Dim X
+Dim x
 Dim objDict As Object
 Dim lngRow As Long
 
     Set objDict = CreateObject("Scripting.Dictionary")
-    X = Application.Transpose(uniqueRange)
+    x = Application.Transpose(uniqueRange)
 
     If uniqueRange.Count <= 1 Then
         GetUnique = Array()
         Exit Function
     End If
 
-    For lngRow = 1 To UBound(X, 1)
-        objDict(X(lngRow)) = 1
+    For lngRow = 1 To UBound(x, 1)
+        objDict(x(lngRow)) = 1
     Next
 
     GetUnique = objDict.Keys
@@ -90,12 +90,12 @@ Dim lngRow As Long
 End Function
 
 Public Function GetUniqueIf(uniqueRange As Range, conditionRange As Range, condition As Variant)
-Dim X
+Dim x
 Dim objDict As Object
 Dim lngRow As Long
 
     Set objDict = CreateObject("Scripting.Dictionary")
-    X = Application.Transpose(uniqueRange)
+    x = Application.Transpose(uniqueRange)
     Z = Application.Transpose(conditionRange)
     
     If uniqueRange.Count <= 1 Then
@@ -103,14 +103,14 @@ Dim lngRow As Long
         Exit Function
     End If
     
-    If UBound(X, 1) <> UBound(Z, 1) Then
+    If UBound(x, 1) <> UBound(Z, 1) Then
         MsgBox ("Ranges must be same length.")
         End
     End If
 
-    For lngRow = 1 To UBound(X, 1)
+    For lngRow = 1 To UBound(x, 1)
         If Z(lngRow) = condition Then
-            objDict(X(lngRow)) = 1
+            objDict(x(lngRow)) = 1
         End If
     Next
 
@@ -130,3 +130,12 @@ End Function
 Public Function ArrayLen(arr1 As Variant) As Integer
     ArrayLen = UBound(arr1) - LBound(arr1)
 End Function
+
+Public Function Max(x, y As Variant) As Variant
+  Max = IIf(x > y, x, y)
+End Function
+
+Public Function Min(x, y As Variant) As Variant
+   Min = IIf(x < y, x, y)
+End Function
+

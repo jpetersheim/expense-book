@@ -1,13 +1,4 @@
-﻿'''TODO
-'---------
-''Categorize
-'Auto-fill based on past - is this possible?
-'---------
-''Misc
-'Working sheet picks up Jan 1900 (0) as date
-'Working sheet picks up "Total Budget" from bottom of categories
-
-Public Sub CategorizeTrans()
+﻿Public Sub CategorizeTrans()
     frmCat.Show
 End Sub
 

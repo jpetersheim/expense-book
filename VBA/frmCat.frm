@@ -50,7 +50,28 @@ Private Sub cmbEmptyCol_Change()
 End Sub
 
 Private Sub cmdAutofill_Click()
-
+    leaveEmpty = MsgBox("Would you like transactions with multiple previous categories to be left blank? If No then the first category in the Expense List will be used.", vbYesNo)
+    
+    With lsbTransactions
+        For j = 0 To .ListCount - 1
+            jRow = .List(j, 6) + 2
+            Set Rng = Sheets("Expense List").Range("A" & (jRow) & ":L" & (jRow))
+            uniqueName = .List(j, 2)
+            
+            Sheets("Expense List").Activate
+            tempArr = GetUniqueIf(Sheets("Expense List").Range(Cells(3, 6), Cells(lastExpenseRow, 6)), _
+                        Sheets("Expense List").Range(Cells(3, 4), Cells(lastExpenseRow, 4)), uniqueName)
+                        
+            ' used 2 because the empty value counts in the array, so if it has 2 previous itll be 3
+            If UBound(tempArr) >= 2 And leaveEmpty = vbYes Then
+                Rng.Cells(1, 6).Value = ""
+            Else
+                Rng.Cells(1, 6).Value = tempArr(0)
+            End If
+        Next j
+    End With
+    
+    Call UpdateArrays
 End Sub
 
 Private Sub cmdCat_Click()
@@ -266,6 +287,8 @@ Private Sub UserForm_Initialize()
     Call BackupExpenses
     Call ListTransactions
     
+    cmbEmptyCol.Value = "Category"
+    
 End Sub
 
 Private Sub ListTransactions(Optional filter As String, Optional colEmpty As Integer, Optional accFilter As String, Optional dateFilter As String)
@@ -364,7 +387,7 @@ Private Sub ListTransactions(Optional filter As String, Optional colEmpty As Int
     
     Me.lblListNum = CStr(Me.lsbTransactions.ListCount)
     Me.lblSelNum = "0"
-    lsbTransactions.ListIndex = 1
+    'lsbTransactions.ListIndex = 1
 End Sub
 
 Private Sub ListSelect(lsb, all As Boolean)
@@ -402,7 +425,9 @@ Public Sub BackupExpenses()
 End Sub
 
 Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
-    Call cmdRevert_Click
+    If CloseMode = 0 Then
+        Call cmdRevert_Click
+    End If
 End Sub
 
 Private Sub UpdateArrays()

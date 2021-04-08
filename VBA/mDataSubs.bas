@@ -95,10 +95,10 @@ Public Sub ImportData()
         expFileNameL = LCase(expFileName)
         
         expListSheet.Activate
-        LastRow = expListSheet.Range("K65536").End(xlUp).Row
+        lastRow = expListSheet.Range("K65536").End(xlUp).Row
         
         'Determine if this file has been uploaded before
-        currFilesArr = GetUnique(expListSheet.Range(Cells(3, 12), Cells(LastRow, 12)))
+        currFilesArr = GetUnique(expListSheet.Range(Cells(3, 12), Cells(lastRow, 12)))
         
         For impFile = 0 To ArrayLen(currFilesArr)
             If currFilesArr(impFile) = expFileName Then
@@ -148,7 +148,7 @@ Public Sub ImportData()
         firstEmptyExpRow = GetEmptyRow(expListSheet, 11, 3)
         
         expListSheet.Activate
-        currTrans = Application.WorksheetFunction.max(expListSheet.Range(Cells(4, 1), Cells(firstEmptyExpRow, 1)))
+        currTrans = Application.WorksheetFunction.Max(expListSheet.Range(Cells(4, 1), Cells(firstEmptyExpRow, 1)))
         
         'Open each workbook
         Workbooks.OpenText dlgOpen.SelectedItems.Item(expForm)
@@ -206,10 +206,10 @@ Public Sub ImportTransactions(company As String, account As String)
     withdrawalcol = Range(varSheet.Cells(accVarRow, 10).Value & 1).column
     depositCol = Range(varSheet.Cells(accVarRow, 11).Value & 1).column
         
-    LastRow = expSheet.Range("A65536").End(xlUp).Row
+    lastRow = expSheet.Range("A65536").End(xlUp).Row
     tempError = 0
     
-    For trans = firstRow To LastRow
+    For trans = firstRow To lastRow
         tdate = expSheet.Cells(trans, expDateCol).Value
         tdesc = expSheet.Cells(trans, expDescCol).Value
         
@@ -289,20 +289,24 @@ Public Sub SetTransIDs()
     prevSheet = ActiveSheet.Name
     expListSheet.Activate
 
-    LastRow = GetEmptyRow(expListSheet, 11, 3) - 1
+    lastRow = GetEmptyRow(expListSheet, 11, 3) - 1
     
-    For t = 3 To LastRow
+    For t = 3 To lastRow
         expListSheet.Cells(t, 1).Value = t - 2
-        'expListSheet.Cells(t, 13).Formula = "=TEXT(B3,""mmmm"")"
     Next t
     
-    expListSheet.Range(Cells(3, 13), Cells(LastRow, 13)).Formula = "=TEXT(B3,""mmmm"")"
-    expListSheet.Range(Cells(3, 14), Cells(LastRow, 14)).Formula = "=YEAR(B3)"
+    If lastRow = 2 Then
+        ActiveWorkbook.Names("ExpenseList").RefersTo = expListSheet.Range(Cells(2, 1), Cells(lastRow, 14))
+        lastRow = 4
+    Else
+        expListSheet.Range(Cells(3, 13), Cells(lastRow, 13)).Formula = "=TEXT(B3,""mmmm"")"
+        expListSheet.Range(Cells(3, 14), Cells(lastRow, 14)).Formula = "=YEAR(B3)"
+        
+        ActiveWorkbook.Names("ExpenseList").RefersTo = expListSheet.Range(Cells(2, 1), Cells(lastRow, 14))
+    End If
     
-    ActiveWorkbook.Names("ExpenseList").RefersTo = expListSheet.Range(Cells(2, 1), Cells(LastRow, 14))
-    
-    arrMonths = GetUnique(expListSheet.Range(Cells(3, 13), Cells(LastRow, 13)))
-    arrYears = GetUnique(expListSheet.Range(Cells(3, 14), Cells(LastRow, 14)))
+    arrMonths = GetUnique(expListSheet.Range(Cells(3, 13), Cells(lastRow, 13)))
+    arrYears = GetUnique(expListSheet.Range(Cells(3, 14), Cells(lastRow, 14)))
     
     ActiveWorkbook.Sheets("Working Sheet").Activate
     Sheets("Working Sheet").Range("B5", Range("B5").End(xlDown)).Clear
@@ -338,10 +342,10 @@ Public Sub SetTransIDs()
         .Apply
     End With
     
-    LastRow = GetEmptyRow(Sheets("Working Sheet"), 2, 3) - 1
-    ActiveWorkbook.Names("Month_List").RefersTo = Sheets("Working Sheet").Range(Cells(3, 2), Cells(LastRow, 2))
-    LastRow = GetEmptyRow(Sheets("Working Sheet"), 3, 3) - 1
-    ActiveWorkbook.Names("Year_List").RefersTo = Sheets("Working Sheet").Range(Cells(3, 3), Cells(LastRow, 3))
+    lastRow = GetEmptyRow(Sheets("Working Sheet"), 2, 3) - 1
+    ActiveWorkbook.Names("Month_List").RefersTo = Sheets("Working Sheet").Range(Cells(3, 2), Cells(lastRow, 2))
+    lastRow = GetEmptyRow(Sheets("Working Sheet"), 3, 3) - 1
+    ActiveWorkbook.Names("Year_List").RefersTo = Sheets("Working Sheet").Range(Cells(3, 3), Cells(lastRow, 3))
     
     Sheets(prevSheet).Activate
     Application.ScreenUpdating = True

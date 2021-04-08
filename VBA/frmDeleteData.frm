@@ -52,7 +52,7 @@ Private Sub cmdDelete_Click()
     End If
     
     firstRow = 3
-    LastRow = expListSheet.Range("A65536").End(xlUp).Row
+    lastRow = expListSheet.Range("A65536").End(xlUp).Row
     
     If mpDelete.Value = 0 Then
         Set lsbData = lsbDataset
@@ -68,7 +68,7 @@ Private Sub cmdDelete_Click()
         
         For i = 0 To lsbData.ListCount - 1
             If lsbData.Selected(i) Then
-                For j = firstRow To LastRow
+                For j = firstRow To lastRow
                     'Can format - strings still show up as their original values, just dates are changed
                     If Format(expListSheet.Cells(j, checkCol).Value, "dd-mmm-yyyy") = lsbData.List(i) Then
                         expListSheet.Rows(j).Delete
@@ -92,7 +92,7 @@ Private Sub cmdDelete_Click()
         
         For i = 0 To lsbData.ListCount - 1
             If lsbData.Selected(i) Then
-                For j = firstRow To LastRow
+                For j = firstRow To lastRow
                     'Can format - strings still show up as their original values, just dates are changed
                     If Format(expListSheet.Cells(j, 12).Value, "dd-mmm-yyyy") = lsbData.List(i) And _
                     Format(expListSheet.Cells(j, checkCol).Value, "dd-mmm-yyyy") = check2 Then
@@ -135,15 +135,15 @@ End Sub
 Private Sub ReloadDatasetListBox()
 
     firstRow = 3
-    LastRow = expListSheet.Range("A65536").End(xlUp).Row
+    lastRow = expListSheet.Range("A65536").End(xlUp).Row
     
-    If LastRow < 3 Then
-        LastRow = 3
+    If lastRow < 3 Then
+        lastRow = 3
     End If
     
-    datesArr = GetUnique(expListSheet.Range(Cells(firstRow, 11), Cells(LastRow, 11)))
-    accountsArr = GetUnique(expListSheet.Range(Cells(firstRow, 10), Cells(LastRow, 10)))
-    filesArr = GetUnique(expListSheet.Range(Cells(firstRow, 12), Cells(LastRow, 12)))
+    datesArr = GetUnique(expListSheet.Range(Cells(firstRow, 11), Cells(lastRow, 11)))
+    accountsArr = GetUnique(expListSheet.Range(Cells(firstRow, 10), Cells(lastRow, 10)))
+    filesArr = GetUnique(expListSheet.Range(Cells(firstRow, 12), Cells(lastRow, 12)))
     
     For D = 0 To ArrayLen(datesArr)
         datesArr(D) = Format(datesArr(D), "dd-mmm-yyyy")
@@ -183,8 +183,8 @@ Private Sub ReloadDatasetListBox()
             rngCol = 44
         End If
         
-        tempArr = GetUniqueIf(expListSheet.Range(Cells(firstRow, rngCol), Cells(LastRow, rngCol)), _
-            expListSheet.Range(Cells(firstRow, condCol), Cells(LastRow, condCol)), condFind)
+        tempArr = GetUniqueIf(expListSheet.Range(Cells(firstRow, rngCol), Cells(lastRow, rngCol)), _
+            expListSheet.Range(Cells(firstRow, condCol), Cells(lastRow, condCol)), condFind)
         
     End If
 

@@ -49,13 +49,16 @@ Private Sub cmdAdd_Click()
         Exit Sub
     End If
     
+    accVarWs.Activate
     ActiveWorkbook.Sheets("Account Variables").Visible = xlSheetVisible
 
     Set accVarWs = ActiveWorkbook.Sheets("Account Variables")
     newAccRow = GetEmptyRow(accVarWs, 1, 2)
     
+    Sheets("Main Tab").Activate
+    
     For j = 2 To (newAccRow + 1)
-        If accVarWs.Cells(j, 1) = Me.txtCompany.Value And accVarWs.Cells(j, 2) = Me.cmbAccountType.Value And rowModify = 0 Then
+        If CStr(accVarWs.Cells(j, 1).Value) = Me.txtCompany.Value And accVarWs.Cells(j, 2) = Me.cmbAccountType.Value And rowModify = 0 Then
             overYN = MsgBox("Import settings for " & Me.txtCompany.Value & " " & Me.cmbAccountType.Value & " already exist. Would you like to overwrite these settings?", vbYesNo)
             If overYN = vbYes Then
                 newAccRow = j
@@ -64,7 +67,7 @@ Private Sub cmdAdd_Click()
             End If
         ElseIf rowModify > 0 Then
             newAccRow = rowModify
-            If accVarWs.Cells(j, 1) = Me.txtCompany.Value And accVarWs.Cells(j, 2) = Me.cmbAccountType.Value Then
+            If CStr(accVarWs.Cells(j, 1).Value) = Me.txtCompany.Value And accVarWs.Cells(j, 2) = Me.cmbAccountType.Value Then
                 over2YN = MsgBox("Import settings for " & Me.txtCompany.Value & " " & Me.cmbAccountType.Value & " already exist. Are you sure you want to modify/overwite these settings?", vbYesNo)
                 If over2YN = vbNo Then
                     Exit Sub
@@ -109,6 +112,7 @@ Private Sub cmdAdd_Click()
     End If
     
     accVarWs.Visible = xlSheetHidden
+    Sheets("Main Tab").Activate
     
     Call frmCurrAccs.PopAccLsb
     
