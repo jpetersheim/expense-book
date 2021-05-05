@@ -137,3 +137,12 @@ Public Sub ImportSettings()
     
     MsgBox "Your data import settings have been applied."
 End Sub
+
+Public Function ShowNewAccForm(Optional Modal As Boolean = False)
+    'API to display a userform in THIS workbook, from another workbook
+
+     On Error Resume Next
+     frmNewAcc.Show IIf(Modal, vbModal, vbModeless)
+     ShowNewAccForm = (Err.Number = 0)
+End Function
+

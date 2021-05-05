@@ -15,16 +15,23 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Public accVarWs As Worksheet
+Public expListBook As Workbook
 Public lastAccRow As Integer
 Public rowModify As Integer
 
 Private Sub cmdAddNew_Click()
     rowModify = 0
-    frmNewAcc.Show
+    'frmNewAcc.Show
+    expListBook.Activate
+    Application.Run ("'" & expListBook.Name & "'!mTasks.ShowNewAccForm")
     Call PopAccLsb
 End Sub
 
 Private Sub cmdMod_Click()
+    If lsbCurrAccs.ListIndex = -1 Then
+        MsgBox "No item selected."
+        Exit Sub
+    End If
 
     accNum = lsbCurrAccs.ListIndex
     rowModify = 0
@@ -45,7 +52,11 @@ Private Sub cmdMod_Click()
 End Sub
 
 Private Sub cmdRemove_Click()
-
+    If lsbCurrAccs.ListIndex = -1 Then
+        MsgBox "No item selected"
+        Exit Sub
+    End If
+    
     remYN = MsgBox("Are you sure you want to remove the selected settings?", vbYesNo)
     
     If remYN = vbYes Then
@@ -66,6 +77,7 @@ End Sub
 
 Private Sub UserForm_Initialize()
     Set accVarWs = ActiveWorkbook.Sheets("Account Variables")
+    Set expListBook = ActiveWorkbook
     Call PopAccLsb
 End Sub
 
@@ -81,3 +93,4 @@ Public Sub PopAccLsb()
         c = c + 1
     Next accRow
 End Sub
+

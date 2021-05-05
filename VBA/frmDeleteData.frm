@@ -45,6 +45,17 @@ End Sub
 
 Private Sub cmdDelete_Click()
 
+    If mpDelete.Value = 0 Then
+        Set lsbData = lsbDataset
+    Else
+        Set lsbData = lsbDDDataset
+    End If
+
+    If lsbData.ListIndex = -1 Then
+        MsgBox "No item selected."
+        Exit Sub
+    End If
+    
     deleteYN = MsgBox("Are you sure you want to delete the selected files?", vbYesNo)
     
     If deleteYN = vbNo Then

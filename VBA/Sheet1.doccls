@@ -8,9 +8,9 @@
     If Not Application.Intersect(KeyCells, Range(Target.Address)) _
            Is Nothing Then
         
+        ActiveSheet.Unprotect
         Call ThisWorkbook.GetTransactions
         
-        ActiveSheet.Unprotect
         lastBudgetItem = GetEmptyRow(ActiveSheet, 2, 23) - 1
         ActiveSheet.ChartObjects("Category_Spending").Activate
         ActiveChart.SetSourceData Source:=ActiveSheet.Range(Cells(23, 2), Cells(lastBudgetItem, 3))
