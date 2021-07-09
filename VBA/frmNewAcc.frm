@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmNewAcc 
-   Caption         =   "Add new account"
+   Caption         =   "Add new account type"
    ClientHeight    =   6360
    ClientLeft      =   120
    ClientTop       =   465
@@ -118,6 +118,10 @@ Private Sub cmdAdd_Click()
     
     Unload Me
     
+End Sub
+
+Private Sub Label1_Click()
+
 End Sub
 
 Private Sub togMultiCol_Change()

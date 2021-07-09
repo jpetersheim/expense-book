@@ -50,7 +50,7 @@ Private Sub cmbEmptyCol_Change()
 End Sub
 
 Private Sub cmdAutofill_Click()
-    leaveEmpty = MsgBox("Would you like transactions with multiple previous categories to be left blank? If No then the first category in the Expense List will be used.", vbYesNo)
+    leaveEmpty = MsgBox("Would you like transactions with multiple previous categories to be left blank? If No then the first category listed in the Expense List will be used.", vbYesNo)
     
     With lsbTransactions
         For j = 0 To .ListCount - 1
